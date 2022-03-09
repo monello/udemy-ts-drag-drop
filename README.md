@@ -1,7 +1,7 @@
 # udemy-ts-drag-drop
 This is the code for the Udemy TypeScript project (Section 9)
 
-I manually added page-navigation to the commits that show progress in the form of changes as applied by following the course.
+I manually added page-navigation to the commits that show progress in the form of code-changes as applied by following the course.
 
 Some commits deal with key learning points, these I will try to list the be "Key Commits" section below.
 

@@ -13,6 +13,8 @@ class ProjectInput {
 
         // Extract the HTML Element (the <form>) from the Fragment
         this.formElement = importedNode.firstElementChild as HTMLFormElement;
+        // Add an id-attr to the form, to tie it up with the CSS
+        this.formElement.id = 'user-input';
 
         // Now insert the form element
         this.attach();

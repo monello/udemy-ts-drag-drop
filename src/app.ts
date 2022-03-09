@@ -9,7 +9,7 @@ class ProjectInput {
 
         // Grab the content from the HTML Template element (HTML Node) and pass in true to make a deep-copy)
         // This creates a document-fragment
-        const importedNode = document.importNode(this.templateElement, true);
+        const importedNode = document.importNode(this.templateElement.content, true);
 
         // Extract the HTML Element (the <form>) from the Fragment
         this.formElement = importedNode.firstElementChild as HTMLFormElement;
@@ -23,3 +23,5 @@ class ProjectInput {
         this.hostElement.insertAdjacentElement('afterbegin', this.formElement);
     }
 }
+
+const prjInput = new ProjectInput();

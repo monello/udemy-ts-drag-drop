@@ -6,6 +6,16 @@ I manually added page-navigation to the commits that show progress in the form o
 
 Some commits deal with key learning points, these I will try to list below in the "Key Commits" section.
 
+# Set-up
+1. Clone the repo
+2. Install Node.js if you haven't got it installed on your system yet.
+3. In the Terminal run `npm install` in the root dir
+4. Run `npm install -g typescript`
+5. Run `tsc init`
+6. Run `npm start` (leave it running)
+7. Open a new Terminal and run `tsc -w` (leave it running)
+8. In a 3rd teminal run `npx cypress open`
+
 # Key Commits
 
 Comment | Description | Commit Shortcut

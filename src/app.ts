@@ -1,27 +1,3 @@
-// autobind decorator
-//  - The underscore variables tell TS that we don't need these input parameters,
-//      but we must add them to get to the parameter(s) we do need.
-const autobind = (
-    _: any, // target: any,
-    _2: string, // methodName: string,
-    descriptor: PropertyDescriptor
-) => {
-    const originalMethod = descriptor.value;
-    const adjustedDescriptor: PropertyDescriptor = {
-        configurable: true,
-        // Using a getter "get()", is an alternative way to add a "value" to the new PropertyDescriptor
-        // You cannot have a "value" and a "getter" (or "setter") on the same ProprtyDescriptor
-        // get() was picked here as it is a function gives us the correct context for the this-keyword (ie the
-        //    class/object the property that this ProperyDescriptor describes)
-        //    Its is also useful that is ie a function in case we wanted to add som extra logic before return the value.
-        get() {
-            const boundFn = originalMethod.bind(this);
-            return boundFn;
-        }
-    };
-    return adjustedDescriptor;
-
-}
 class ProjectInput {
     templateElement: HTMLTemplateElement;
     hostElement: HTMLDivElement;
@@ -57,8 +33,7 @@ class ProjectInput {
     }
 
     // The on-submit handler function for the form
-    @autobind
-    private submitHandler(event: Event) {
+    private submitHandler = (event: Event) => {
         // Prevent the form from sending an HTTPRequest (it's default behaviour on-submit)
         event.preventDefault();
         // Temporatu code to confirm that our submitHandler does indeed fire when the form-submit fires

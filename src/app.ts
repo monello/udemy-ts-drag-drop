@@ -1,3 +1,42 @@
+interface Validatable {
+    value: string | number;
+    required?: boolean;
+    minLength?: number;
+    maxLength?: number;
+    min?: number;
+    max?: number;
+}
+
+const validate = (validatableInput: Validatable) => {
+    let isValid = true;
+
+    if (validatableInput.required) {
+        isValid = isValid && validatableInput.value.toString().trim().length !== 0;
+    }
+
+    // check if minLength is set and not 0.
+    // !== undefined will not check for null, but != null will check for both undefined and null
+    // This check only makes sense for strings, so a Type Guard was added to make sure this if statement only executes for strings
+    if (validatableInput.minLength != null && typeof validatableInput.value === 'string') {
+        // if isValid was false during the previous check the next statement will eval to false and won't even check the right-side of '&&'
+        isValid = isValid && validatableInput.value.length >= validatableInput.minLength;
+    }
+
+    if (validatableInput.maxLength != null && typeof validatableInput.value === 'string') {
+        isValid = isValid && validatableInput.value.length <= validatableInput.maxLength;
+    }
+
+    if (validatableInput.min != null && typeof validatableInput.value === 'number') {
+        isValid = isValid && validatableInput.value >= validatableInput.min;
+    }
+
+    if (validatableInput.max != null && typeof validatableInput.value === 'number') {
+        isValid = isValid && validatableInput.value <= validatableInput.max;
+    }
+
+    return isValid;
+}
+
 class ProjectInput {
     templateElement: HTMLTemplateElement;
     hostElement: HTMLDivElement;
@@ -37,18 +76,35 @@ class ProjectInput {
     private gatherUserInput(): [string, string, number] | void {
         const enteredTitle = this.titleInputElement.value;
         const enteredDescription = this.descriptionInputElemet.value;
-        const enteredPeople = this.peopleInputElemet.value;
+        const enteredPeople = +this.peopleInputElemet.value;
+
+        // Set up some validatableInput objects to send to the valdate() function
+        const titleValidatable = {
+            value: enteredTitle,
+            required: true
+        }
+        const descriptionValidatable = {
+            value: enteredDescription,
+            required: true,
+            minLength: 5
+        }
+        const peopleValidatable = {
+            value: enteredPeople,
+            required: true,
+            min: 1,
+            max: 10
+        }
 
         // This very basic validation will improved in the next lecture
         if (
-            enteredTitle.trim().length === 0 ||
-            enteredDescription.trim().length === 0 ||
-            enteredPeople.trim().length === 0
+            !validate(titleValidatable) ||
+            !validate(descriptionValidatable) ||
+            !validate(peopleValidatable)
         ) {
             alert('Invalid input, please try again!');
             return;
         } else {
-            return [enteredTitle, enteredDescription, +enteredPeople];
+            return [enteredTitle, enteredDescription, enteredPeople];
         }
     }
 

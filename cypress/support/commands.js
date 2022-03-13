@@ -23,3 +23,25 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+Cypress.Commands.add('submitAndExpectError', () => {
+    const stub = cy.stub()
+    cy.on('window:alert', stub)
+    cy.get('form#user-input')
+        .find('button[type="submit"]')
+        .click()
+        .then(() => {
+            expect(stub.getCall(0)).to.be.calledWith('Invalid input, please try again!')
+        });
+});
+
+Cypress.Commands.add('submitAndExpectReset', () => {
+    cy.get('form#user-input')
+        .find('button[type="submit"]')
+        .click()
+
+    // Submit form and assert that form field are cleared
+    cy.get('@title').should('have.value', '');
+    cy.get('@desc').should('have.value', '');
+    cy.get('@people').should('have.value', '');
+});

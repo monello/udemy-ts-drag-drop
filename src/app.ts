@@ -86,7 +86,8 @@ class ProjectInput {
         const descriptionValidatable = {
             value: enteredDescription,
             required: true,
-            minLength: 5
+            minLength: 5,
+            maxLength: 10
         }
         const peopleValidatable = {
             value: enteredPeople,

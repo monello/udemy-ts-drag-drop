@@ -32,13 +32,47 @@ class ProjectInput {
         this.attach();
     }
 
+    // This function gets all the input data from the form elements and returns it as a Tuple
+    // - example use of a Tuple return type for a function
+    private gatherUserInput(): [string, string, number] | void {
+        const enteredTitle = this.titleInputElement.value;
+        const enteredDescription = this.descriptionInputElemet.value;
+        const enteredPeople = this.peopleInputElemet.value;
+
+        // This very basic validation will improved in the next lecture
+        if (
+            enteredTitle.trim().length === 0 ||
+            enteredDescription.trim().length === 0 ||
+            enteredPeople.trim().length === 0
+        ) {
+            alert('Invalid input, please try again!');
+            return;
+        } else {
+            return [enteredTitle, enteredDescription, +enteredPeople];
+        }
+    }
+
+    private clearInputs() {
+        this.titleInputElement.value = '';
+        this.descriptionInputElemet.value = '';
+        this.peopleInputElemet.value = '';
+    }
+
     // The on-submit handler function for the form
     private submitHandler = (event: Event) => {
         // Prevent the form from sending an HTTPRequest (it's default behaviour on-submit)
         event.preventDefault();
-        // Temporatu code to confirm that our submitHandler does indeed fire when the form-submit fires
-        console.log(this.titleInputElement.value);
-
+        const userInput = this.gatherUserInput();
+        // Check if the return type is a Tuple
+        // - keep in mind TS gets compiled to JS and JS does not have a Tuple type, so we can use 'userInput instanceof Tuple'
+        // - Tuples get compiled to arrays in JS (that is why it has the sntax it has in TS) and we can check for arrays:
+        //      Option 1: userInput instanceof Array
+        //      Option 2: Array.isArray(userInput) // The lecturer went with this option
+        if (Array.isArray(userInput)) {
+            const [title, description, people] = userInput;
+            console.log(title, description, people);
+            this.clearInputs();
+        }
     }
 
     // Adds an events to the form

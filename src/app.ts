@@ -160,6 +160,11 @@ class ProjectList {
 
     private renderProjects() {
         const listEl = document.getElementById(`${this.type}-project-list`)! as HTMLUListElement;
+        // a very basic solution to the problem of projects getting repeated to the list is to just
+        //   empty out the list element before we append the projects
+        // In real-life a more elegant sultion can be done, but we're going with a simple one to keep the
+        //   focus on the learning points of this course
+        listEl.innerHTML = '';
         // now loop through all the currentprojects en add them to the listEl
         for (const prjItem of this.currentProjects) {
             // now build the new project list-item

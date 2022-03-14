@@ -10,9 +10,7 @@ class Project {
         public description: string,
         public people: number,
         public status: ProjectStatus
-    ) {
-
-    }
+    ) { }
 }
 
 // Project State Mangement
@@ -71,8 +69,6 @@ class ProjectState {
 
 // Instantiate the global Project state object
 const projectState = ProjectState.getInstance();
-
-
 
 // Validation
 // -----------------------------------------------------------------------------------------------------------
@@ -144,8 +140,17 @@ class ProjectList {
         // - listeners are functions
         // - we pass in the projects. This will be the list of projects AT THE TIME when this listener is called
         projectState.addListener((projects: Project[]) => {
+            // Filter the projects by status.
+            // .filter() return a new array (ie. not a reference to the original array we are enumerating)
+            const filteredProjects = projects.filter(prj => {
+                if (this.type === 'active') {
+                    return prj.status === ProjectStatus.Active
+                }
+                return prj.status === ProjectStatus.Complete
+            })
+
             // override the currentProjects with the lastest list of projects
-            this.currentProjects = projects;
+            this.currentProjects = filteredProjects;
             this.renderProjects();
         });
 

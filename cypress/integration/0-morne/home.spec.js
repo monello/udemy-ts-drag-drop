@@ -35,4 +35,18 @@ describe('Tests on the root page', () => {
         // Check that the people label is correct
         cy.get('@form').find('label[for="people"]').contains('People')
     });
+
+    it('checks that the 2 Project sections display', () => {
+        cy.get('#active-projects').as('activeProjects');
+        cy.get('#completed-projects').as('completedProjects');
+
+        // Check that the headers exist and contain the expected text
+        cy.get('@activeProjects').find('header').find('h2').should('contain', 'ACTIVE PROJECTS');
+        cy.get('@completedProjects').find('header').find('h2').should('contain', 'COMPLETED PROJECTS');
+
+        // Check that the list section exists (empty at this stage)
+        cy.get('@activeProjects').find('ul#active-project-list');
+        cy.get('@completedProjects').find('ul#completed-project-list');
+
+    });
 });

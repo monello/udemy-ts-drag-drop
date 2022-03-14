@@ -1,5 +1,63 @@
+// Project State Mangement
+// -----------------------------------------------------------------------------------------------------------
+
+class ProjectState {
+    // The list of all projects
+    private projects: any[] = [];
+    // instance will hold the instance of this class' object once instantiated.
+    // - has to be 'static' to be available in the static getInstance() method
+    private static instance: ProjectState;
+    // An array that will list all the event-listeners
+    private listeners: any[] = [];
+
+    // This method insures that only a single instance of this class can be created
+    // Its has to be statis so that you can call it without instantiating the class first.
+    static getInstance() {
+        if (this.instance) {
+            return this.instance;
+        }
+        this.instance = new ProjectState();
+        return this.instance;
+    }
+
+    // This function adds listener functions to the listeners array
+    // Accepts a function as an argument.
+    addListener(listenerFn: Function) {
+        this.listeners.push(listenerFn);
+    }
+
+    // This method adds projects to the "projects" list property
+    addProject(title: string, description: string, peopleCount: number) {
+        // Create the stucture of a new project
+        const newProject = {
+            // unique id for the project
+            // - Math.random() was just use, quick and dirty for this demo project to avoid getting distracted from the lecture topic
+            id: Math.random().toString(),
+            title: title,
+            description: description,
+            people: peopleCount
+        }
+
+        // Add the new project to the projects list
+        this.projects.push(newProject);
+        for (const listenerFn of this.listeners) {
+            // Seeing as the listeners are in the ProjectState class it means it needs to manage the state of our projects for us
+            //    to do that we need to send it the list of our projects as an argument
+            // We send a copy of our projects list, so that we don't accidentaly change it somewhere else in our code and get unexpected weird bugs
+            // (see making a true copy of an array here: https://codesandbox.io/s/easy-true-copy-an-array-with-slice-lerf22?file=/src/index.js)
+            listenerFn(this.projects.slice());
+        }
+    }
+}
+
+// Instantiate the global Project state object
+const projectState = ProjectState.getInstance();
+
+
+
 // Validation
 // -----------------------------------------------------------------------------------------------------------
+
 interface Validatable {
     value: string | number;
     required?: boolean;
@@ -46,6 +104,7 @@ class ProjectList {
     templateElement: HTMLTemplateElement;
     hostElement: HTMLDivElement;
     sectionElement: HTMLElement; // There is no type like HTMLSectionElement - so it's parent type HTMLElement will do
+    currentProjects: any[];
 
     // Creating a class property with the "shortcut" method by adding the property's accessor and property defnition
     //  in the constructor argument list instead of the class body (as the other props above)
@@ -54,6 +113,7 @@ class ProjectList {
     constructor(private type: 'active' | 'completed') {
         this.templateElement = document.getElementById('project-list') as HTMLTemplateElement;
         this.hostElement = document.getElementById('app') as HTMLDivElement;
+        this.currentProjects = [];
 
         const importedNode = document.importNode(this.templateElement.content, true);
 
@@ -61,8 +121,28 @@ class ProjectList {
         // Create dynamic id for each list item, based on the project "type"
         this.sectionElement.id = `${this.type}-projects`;
 
+        // add an event listener to the ProjectState
+        // - listeners are functions
+        // - we pass in the projects. This will be the list of projects AT THE TIME when this listener is called
+        projectState.addListener((projects: any[]) => {
+            // override the currentProjects with the lastest list of projects
+            this.currentProjects = projects;
+            this.renderProjects();
+        });
+
         this.attach();
         this.renderContent();
+    }
+
+    private renderProjects() {
+        const listEl = document.getElementById(`${this.type}-project-list`)! as HTMLUListElement;
+        // now loop through all the currentprojects en add them to the listEl
+        for (const prjItem of this.currentProjects) {
+            // now build the new project list-item
+            const listItem = document.createElement('li');
+            listItem.textContent = prjItem.title;
+            listEl.appendChild(listItem);
+        }
     }
 
     private attach() {
@@ -72,7 +152,7 @@ class ProjectList {
     private renderContent() {
         const listId = `${this.type}-project-list`;
         this.sectionElement.querySelector('ul')!.id = listId;
-        this.sectionElement.querySelector('h2')!.textContent = this.type.toUpperCase() + 'PROJECTS';
+        this.sectionElement.querySelector('h2')!.textContent = this.type.toUpperCase() + ' PROJECTS';
     }
 }
 
@@ -169,7 +249,7 @@ class ProjectInput {
         //      Option 2: Array.isArray(userInput) // The lecturer went with this option
         if (Array.isArray(userInput)) {
             const [title, description, people] = userInput;
-            console.log(title, description, people);
+            projectState.addProject(title, description, people);
             this.clearInputs();
         }
     }

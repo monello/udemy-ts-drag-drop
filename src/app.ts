@@ -1,3 +1,5 @@
+// Validation
+// -----------------------------------------------------------------------------------------------------------
 interface Validatable {
     value: string | number;
     required?: boolean;
@@ -36,6 +38,46 @@ const validate = (validatableInput: Validatable) => {
 
     return isValid;
 }
+
+// Project Lists
+// -----------------------------------------------------------------------------------------------------------
+
+class ProjectList {
+    templateElement: HTMLTemplateElement;
+    hostElement: HTMLDivElement;
+    sectionElement: HTMLElement; // There is no type like HTMLSectionElement - so it's parent type HTMLElement will do
+
+    // Creating a class property with the "shortcut" method by adding the property's accessor and property defnition
+    //  in the constructor argument list instead of the class body (as the other props above)
+    // Using a literal type (hardcoded text) as a type.
+    // Combining two literal types using a union
+    constructor(private type: 'active' | 'completed') {
+        this.templateElement = document.getElementById('project-list') as HTMLTemplateElement;
+        this.hostElement = document.getElementById('app') as HTMLDivElement;
+
+        const importedNode = document.importNode(this.templateElement.content, true);
+
+        this.sectionElement = importedNode.firstElementChild as HTMLElement;
+        // Create dynamic id for each list item, based on the project "type"
+        this.sectionElement.id = `${this.type}-projects`;
+
+        this.attach();
+        this.renderContent();
+    }
+
+    private attach() {
+        this.hostElement.insertAdjacentElement('beforeend', this.sectionElement);
+    }
+
+    private renderContent() {
+        const listId = `${this.type}-project-list`;
+        this.sectionElement.querySelector('ul')!.id = listId;
+        this.sectionElement.querySelector('h2')!.textContent = this.type.toUpperCase() + 'PROJECTS';
+    }
+}
+
+// Project Input and Data Gethering
+// -----------------------------------------------------------------------------------------------------------
 
 class ProjectInput {
     templateElement: HTMLTemplateElement;
@@ -147,3 +189,5 @@ class ProjectInput {
 }
 
 const prjInput = new ProjectInput();
+const activeProjects = new ProjectList('active');
+const completedProjects = new ProjectList('completed');

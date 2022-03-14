@@ -1,14 +1,33 @@
+// Project Type
+// -----------------------------------------------------------------------------------------------------------
+
+enum ProjectStatus { Active, Complete };
+
+class Project {
+    constructor(
+        public id: string,
+        public title: string,
+        public description: string,
+        public people: number,
+        public status: ProjectStatus
+    ) {
+
+    }
+}
+
 // Project State Mangement
 // -----------------------------------------------------------------------------------------------------------
 
+type Listener = (items: Project[]) => void;
+
 class ProjectState {
     // The list of all projects
-    private projects: any[] = [];
+    private projects: Project[] = [];
     // instance will hold the instance of this class' object once instantiated.
     // - has to be 'static' to be available in the static getInstance() method
     private static instance: ProjectState;
     // An array that will list all the event-listeners
-    private listeners: any[] = [];
+    private listeners: Listener[] = [];
 
     // This method insures that only a single instance of this class can be created
     // Its has to be statis so that you can call it without instantiating the class first.
@@ -22,21 +41,21 @@ class ProjectState {
 
     // This function adds listener functions to the listeners array
     // Accepts a function as an argument.
-    addListener(listenerFn: Function) {
+    addListener(listenerFn: Listener) {
         this.listeners.push(listenerFn);
     }
 
     // This method adds projects to the "projects" list property
     addProject(title: string, description: string, peopleCount: number) {
         // Create the stucture of a new project
-        const newProject = {
-            // unique id for the project
-            // - Math.random() was just use, quick and dirty for this demo project to avoid getting distracted from the lecture topic
-            id: Math.random().toString(),
-            title: title,
-            description: description,
-            people: peopleCount
-        }
+        // id must be unique per project - Math.random() was just use, quick and dirty for this demo project to avoid getting distracted from the lecture topic
+        const newProject = new Project(
+            Math.random().toString(),
+            title,
+            description,
+            peopleCount,
+            ProjectStatus.Active
+        );
 
         // Add the new project to the projects list
         this.projects.push(newProject);
@@ -104,7 +123,7 @@ class ProjectList {
     templateElement: HTMLTemplateElement;
     hostElement: HTMLDivElement;
     sectionElement: HTMLElement; // There is no type like HTMLSectionElement - so it's parent type HTMLElement will do
-    currentProjects: any[];
+    currentProjects: Project[];
 
     // Creating a class property with the "shortcut" method by adding the property's accessor and property defnition
     //  in the constructor argument list instead of the class body (as the other props above)
@@ -124,7 +143,7 @@ class ProjectList {
         // add an event listener to the ProjectState
         // - listeners are functions
         // - we pass in the projects. This will be the list of projects AT THE TIME when this listener is called
-        projectState.addListener((projects: any[]) => {
+        projectState.addListener((projects: Project[]) => {
             // override the currentProjects with the lastest list of projects
             this.currentProjects = projects;
             this.renderProjects();

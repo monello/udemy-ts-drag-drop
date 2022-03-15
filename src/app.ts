@@ -15,7 +15,7 @@ interface DragTarget {
     dropHandler(event: DragEvent): void;
 
     // potentially be used to do things like give a visual confirmation that the drop was successful-
-    fragLeaveHandler(event: DragEvent): void;
+    dragLeaveHandler(event: DragEvent): void;
 }
 
 // Project Type
@@ -231,7 +231,7 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement>
 // Project Lists
 // -----------------------------------------------------------------------------------------------------------
 
-class ProjectList extends Component<HTMLElement, HTMLDivElement> {
+class ProjectList extends Component<HTMLElement, HTMLDivElement> implements DragTarget {
     currentProjects: Project[];
 
     // Creating a class property with the "shortcut" method by adding the property's accessor and property defnition
@@ -245,9 +245,31 @@ class ProjectList extends Component<HTMLElement, HTMLDivElement> {
         this.renderContent();
     }
 
+    // give a visual clue to the user when he/she is dragging over a valid drop-target
+    dragOverHandler = (_: DragEvent) => {
+        const listElement = this.element.querySelector('ul')!;
+        // Adding a class to an element (this is normal JS not TS specific)
+        listElement.classList.add('droppable');
+    }
+
+    dropHandler = (_: DragEvent) => {
+
+    }
+
+    dragLeaveHandler = (_: DragEvent) => {
+        const listElement = this.element.querySelector('ul')!;
+        // Adding a class to an element (this is normal JS not TS specific)
+        listElement.classList.remove('droppable');
+    }
+
     // PUBLIC METHODS
 
     configure() {
+        // add an event listener for the dragover event
+        this.element.addEventListener('dragover', this.dragOverHandler);
+        this.element.addEventListener('dragleave', this.dragLeaveHandler);
+        this.element.addEventListener('drop', this.dropHandler);
+
         // add an event listener to the ProjectState
         // - listeners are functions
         // - we pass in the projects. This will be the list of projects AT THE TIME when this listener is called

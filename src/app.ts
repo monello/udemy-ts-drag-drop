@@ -27,8 +27,6 @@ class ProjectState {
     // An array that will list all the event-listeners
     private listeners: Listener[] = [];
 
-    id: string = Math.random().toString();
-
     // Add a private constructor (even if you don't have a body for it), as this will avoid the default
     //   of a public constructor when you don't add one.
     // You want to avoid a public constructor when you build a Singleton, else the class can still be instantiated
@@ -120,13 +118,50 @@ const validate = (validatableInput: Validatable) => {
     return isValid;
 }
 
+// Component Base Class
+// -----------------------------------------------------------------------------------------------------------
+
+abstract class Component<T extends HTMLElement, U extends HTMLElement> {
+    templateElement: HTMLTemplateElement;
+    hostElement: T;
+    element: U;
+
+    constructor(
+        templateId: string,
+        hostElementId: string,
+        insertAtStart: boolean,
+        newlementId?: string
+    ) {
+        this.templateElement = document.getElementById(templateId) as HTMLTemplateElement;
+        this.hostElement = document.getElementById(hostElementId) as T;
+
+        const importedNode = document.importNode(this.templateElement.content, true);
+        this.element = importedNode.firstElementChild as U;
+        if (newlementId) {
+            this.element.id = newlementId;
+        }
+
+        this.attach(insertAtStart);
+    }
+
+    // PUBLIC METHODS
+
+    abstract configure(): void;
+    abstract renderContent(): void;
+
+    // PRIVATE METHODS
+
+    private attach(insertAtStart: boolean) {
+        this.hostElement.insertAdjacentElement(insertAtStart ? 'afterbegin' : 'beforeend', this.element);
+    }
+
+
+}
+
 // Project Lists
 // -----------------------------------------------------------------------------------------------------------
 
-class ProjectList {
-    templateElement: HTMLTemplateElement;
-    hostElement: HTMLDivElement;
-    sectionElement: HTMLElement; // There is no type like HTMLSectionElement - so it's parent type HTMLElement will do
+class ProjectList extends Component<HTMLElement, HTMLDivElement> {
     currentProjects: Project[];
 
     // Creating a class property with the "shortcut" method by adding the property's accessor and property defnition
@@ -134,16 +169,15 @@ class ProjectList {
     // Using a literal type (hardcoded text) as a type.
     // Combining two literal types using a union
     constructor(private type: 'active' | 'completed') {
-        this.templateElement = document.getElementById('project-list') as HTMLTemplateElement;
-        this.hostElement = document.getElementById('app') as HTMLDivElement;
+        super('project-list', 'app', false, `${type}-projects`);
         this.currentProjects = [];
+        this.configure();
+        this.renderContent();
+    }
 
-        const importedNode = document.importNode(this.templateElement.content, true);
+    // PUBLIC METHODS
 
-        this.sectionElement = importedNode.firstElementChild as HTMLElement;
-        // Create dynamic id for each list item, based on the project "type"
-        this.sectionElement.id = `${this.type}-projects`;
-
+    configure() {
         // add an event listener to the ProjectState
         // - listeners are functions
         // - we pass in the projects. This will be the list of projects AT THE TIME when this listener is called
@@ -161,10 +195,15 @@ class ProjectList {
             this.currentProjects = filteredProjects;
             this.renderProjects();
         });
-
-        this.attach();
-        this.renderContent();
     }
+
+    renderContent() {
+        const listId = `${this.type}-project-list`;
+        this.element.querySelector('ul')!.id = listId;
+        this.element.querySelector('h2')!.textContent = this.type.toUpperCase() + ' PROJECTS';
+    }
+
+    // PRIVATE METHODS
 
     private renderProjects() {
         const listEl = document.getElementById(`${this.type}-project-list`)! as HTMLUListElement;
@@ -181,54 +220,42 @@ class ProjectList {
             listEl.appendChild(listItem);
         }
     }
-
-    private attach() {
-        this.hostElement.insertAdjacentElement('beforeend', this.sectionElement);
-    }
-
-    private renderContent() {
-        const listId = `${this.type}-project-list`;
-        this.sectionElement.querySelector('ul')!.id = listId;
-        this.sectionElement.querySelector('h2')!.textContent = this.type.toUpperCase() + ' PROJECTS';
-    }
 }
 
 // Project Input and Data Gethering
 // -----------------------------------------------------------------------------------------------------------
 
-class ProjectInput {
-    templateElement: HTMLTemplateElement;
-    hostElement: HTMLDivElement;
-    formElement: HTMLFormElement;
+class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
     titleInputElement: HTMLInputElement;
     descriptionInputElemet: HTMLInputElement;
     peopleInputElemet: HTMLInputElement;
 
     constructor() {
-        this.templateElement = document.getElementById('project-input') as HTMLTemplateElement;
-        this.hostElement = document.getElementById('app') as HTMLDivElement;
-
-        // Grab the content from the HTML Template element (HTML Node) and pass in true to make a deep-copy)
-        // This creates a document-fragment
-        const importedNode = document.importNode(this.templateElement.content, true);
-
-        // Extract the HTML Element (the <form>) from the Fragment
-        this.formElement = importedNode.firstElementChild as HTMLFormElement;
-        // Add an id-attr to the form, to tie it up with the CSS
-        this.formElement.id = 'user-input';
-
+        super('project-input', 'app', true, 'user-input');
         // Accessing the input element in the form
         // Interrestingly TSC does not require the Null Assertion Operator
-        this.titleInputElement = this.formElement.querySelector('#title') as HTMLInputElement;
-        this.descriptionInputElemet = this.formElement.querySelector('#description') as HTMLInputElement;
-        this.peopleInputElemet = this.formElement.querySelector('#people') as HTMLInputElement;
+        this.titleInputElement = this.element.querySelector('#title') as HTMLInputElement;
+        this.descriptionInputElemet = this.element.querySelector('#description') as HTMLInputElement;
+        this.peopleInputElemet = this.element.querySelector('#people') as HTMLInputElement;
 
         // Attach the events to the form element
         this.configure();
-
-        // Now insert the form element
-        this.attach();
     }
+
+    // PUBLIC METHODS
+
+    // Adds an events to the form
+    configure() {
+        // Remember to bind the 'this' context to the submit-handler, else the submit handler's default 'this'
+        //  context will be the HTML element it is attached to and not the class in which the event-handler function
+        //  is defined (Just one of those lovely JS quirks)
+        this.element.addEventListener('submit', this.submitHandler)
+    }
+
+    // This function is added to satisfy the abstract non-option method requirement from the `Component` base class
+    renderContent(): void { }
+
+    // PRIVATE METHODS
 
     // This function gets all the input data from the form elements and returns it as a Tuple
     // - example use of a Tuple return type for a function
@@ -289,19 +316,6 @@ class ProjectInput {
             projectState.addProject(title, description, people);
             this.clearInputs();
         }
-    }
-
-    // Adds an events to the form
-    private configure() {
-        // Remember to bind the 'this' context to the submit-handler, else the submit handler's default 'this'
-        //  context will be the HTML element it is attached to and not the class in which the event-handler function
-        //  is defined (Just one of those lovely JS quirks)
-        this.formElement.addEventListener('submit', this.submitHandler)
-    }
-
-    private attach() {
-        // Insert the new element just after the opening tag of the targetted hostElement
-        this.hostElement.insertAdjacentElement('afterbegin', this.formElement);
     }
 }
 

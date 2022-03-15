@@ -92,6 +92,18 @@ class ProjectState extends State<Project>{
 
         // Add the new project to the projects list
         this.projects.push(newProject);
+        this.updateListeners();
+    }
+
+    moveProject(projectId: string, newStatus: ProjectStatus) {
+        const project = this.projects.find(prj => prj.id === projectId);
+        if (project && project.status !== newStatus) {
+            project.status = newStatus;
+            this.updateListeners();
+        }
+    }
+
+    private updateListeners() {
         for (const listenerFn of this.listeners) {
             // Seeing as the listeners are in the ProjectState class it means it needs to manage the state of our projects for us
             //    to do that we need to send it the list of our projects as an argument
@@ -262,8 +274,11 @@ class ProjectList extends Component<HTMLElement, HTMLDivElement> implements Drag
     }
 
     dropHandler = (event: DragEvent) => {
-        console.log("DROPPING:", event.dataTransfer!.getData('text/plain'));
-
+        const prjId = event.dataTransfer!.getData('text/plain');
+        projectState.moveProject(
+            prjId,
+            this.type === 'active' ? ProjectStatus.Active : ProjectStatus.Complete
+        );
     }
 
     dragLeaveHandler = (_: DragEvent) => {

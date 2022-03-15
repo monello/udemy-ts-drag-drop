@@ -27,6 +27,14 @@ class ProjectState {
     // An array that will list all the event-listeners
     private listeners: Listener[] = [];
 
+    id: string = Math.random().toString();
+
+    // Add a private constructor (even if you don't have a body for it), as this will avoid the default
+    //   of a public constructor when you don't add one.
+    // You want to avoid a public constructor when you build a Singleton, else the class can still be instantiated
+    //   multiple times - thus the class would NOT be a Singleton
+    private constructor() { }
+
     // This method insures that only a single instance of this class can be created
     // Its has to be statis so that you can call it without instantiating the class first.
     static getInstance() {

@@ -207,8 +207,10 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement>
     }
 
     dragStartHandler = (event: DragEvent) => {
-        console.log('DRAG STARTED:', event);
-
+        // read more on the drag and drop functionality available in JS here: https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API
+        event.dataTransfer!.setData('text/plain', this.project.id);
+        // set the cursor during the move
+        event.dataTransfer!.effectAllowed = 'move';
     }
 
     dragEndHandler = (_: DragEvent) => {
@@ -246,13 +248,21 @@ class ProjectList extends Component<HTMLElement, HTMLDivElement> implements Drag
     }
 
     // give a visual clue to the user when he/she is dragging over a valid drop-target
-    dragOverHandler = (_: DragEvent) => {
-        const listElement = this.element.querySelector('ul')!;
-        // Adding a class to an element (this is normal JS not TS specific)
-        listElement.classList.add('droppable');
+    dragOverHandler = (event: DragEvent) => {
+        if (event.dataTransfer && event.dataTransfer.types[0] === 'text/plain') {
+            // In JS a drop is ONLY ALLOWED if the if the drag-over handler on the SAME event has preventDefault()
+            // The DEFAULT of JS Drag & Drop events is not NOT allow dropping, so you have to prevent this default explicitly
+            event.preventDefault();
+
+            const listElement = this.element.querySelector('ul')!;
+            // Adding a class to an element (this is normal JS not TS specific)
+            listElement.classList.add('droppable');
+        }
+
     }
 
-    dropHandler = (_: DragEvent) => {
+    dropHandler = (event: DragEvent) => {
+        console.log("DROPPING:", event.dataTransfer!.getData('text/plain'));
 
     }
 

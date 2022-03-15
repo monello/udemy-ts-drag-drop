@@ -1,3 +1,23 @@
+// Drag & Drop Interfaces
+// -----------------------------------------------------------------------------------------------------------
+
+interface Draggable {
+    // DragEvent is a built-in type in TS
+    dragStartHandler(event: DragEvent): void;
+    dragEndHandler(event: DragEvent): void;
+}
+
+interface DragTarget {
+    // used to confirm that the element you are dragging over is indeed a drag-target
+    dragOverHandler(event: DragEvent): void
+
+    // reacts to the actual "drop" event (and for example update project state)
+    dropHandler(event: DragEvent): void;
+
+    // potentially be used to do things like give a visual confirmation that the drop was successful-
+    fragLeaveHandler(event: DragEvent): void;
+}
+
 // Project Type
 // -----------------------------------------------------------------------------------------------------------
 
@@ -170,7 +190,8 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
 // Project Item
 // -----------------------------------------------------------------------------------------------------------
 
-class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement>
+    implements Draggable {
     private project: Project;
 
     get peopleAssigned() {
@@ -185,7 +206,20 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
         this.renderContent();
     }
 
-    configure() { }
+    dragStartHandler = (event: DragEvent) => {
+        console.log('DRAG STARTED:', event);
+
+    }
+
+    dragEndHandler = (_: DragEvent) => {
+        console.log("DRAG ENNDED");
+
+    }
+
+    configure() {
+        this.element.addEventListener('dragstart', this.dragStartHandler);
+        this.element.addEventListener('dragend', this.dragEndHandler);
+    }
 
     renderContent() {
         this.element.querySelector('h2')!.textContent = this.project.title;

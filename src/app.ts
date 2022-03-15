@@ -16,22 +16,37 @@ class Project {
 // Project State Mangement
 // -----------------------------------------------------------------------------------------------------------
 
-type Listener = (items: Project[]) => void;
+// Now that we are refactoring the code to be more generic and have state applied to potentially more than just Project State
+//  we need to also make the- Listener Generic as it might not always return an array of projects `Project[]`
+type Listener<T> = (items: T[]) => void;
 
-class ProjectState {
+class State<T> {
+    // An array that will list all the event-listeners
+    // - we now "forward" the generic type <T> to our Listener
+    // - we set the visibility to `protected` to make the listeners property available to child classes (classes that inherit from State ie. extends State)
+    protected listeners: Listener<T>[] = [];
+
+    // This function adds listener functions to the listeners array
+    // Accepts a function as an argument.
+    addListener(listenerFn: Listener<T>) {
+        this.listeners.push(listenerFn);
+    }
+}
+
+class ProjectState extends State<Project>{
     // The list of all projects
     private projects: Project[] = [];
     // instance will hold the instance of this class' object once instantiated.
     // - has to be 'static' to be available in the static getInstance() method
     private static instance: ProjectState;
-    // An array that will list all the event-listeners
-    private listeners: Listener[] = [];
 
     // Add a private constructor (even if you don't have a body for it), as this will avoid the default
     //   of a public constructor when you don't add one.
     // You want to avoid a public constructor when you build a Singleton, else the class can still be instantiated
     //   multiple times - thus the class would NOT be a Singleton
-    private constructor() { }
+    private constructor() {
+        super();
+    }
 
     // This method insures that only a single instance of this class can be created
     // Its has to be statis so that you can call it without instantiating the class first.
@@ -41,12 +56,6 @@ class ProjectState {
         }
         this.instance = new ProjectState();
         return this.instance;
-    }
-
-    // This function adds listener functions to the listeners array
-    // Accepts a function as an argument.
-    addListener(listenerFn: Listener) {
-        this.listeners.push(listenerFn);
     }
 
     // This method adds projects to the "projects" list property

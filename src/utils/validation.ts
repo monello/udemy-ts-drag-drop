@@ -38,3 +38,7 @@ export const validate = (validatableInput: Validatable) => {
 
     return isValid;
 }
+
+export const foobar = () => {
+    console.log("FooBar")
+}

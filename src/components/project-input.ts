@@ -1,6 +1,9 @@
 import Component from "./component.js";
-import { validate } from "../utils/validation.js";
-import { projectState } from "../state/project.js";
+//import { validate, foobar } from "../utils/validation";
+import * as validation from "../utils/validation.js";   // example of a bundled import using an alias
+import { projectState as ProjectState } from "../state/project.js"; // Example of aliasing a single import
+
+validation.foobar();
 
 // Project Input and Data Gethering
 export default class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
@@ -62,9 +65,9 @@ export default class ProjectInput extends Component<HTMLDivElement, HTMLFormElem
 
         // This very basic validation will improved in the next lecture
         if (
-            !validate(titleValidatable) ||
-            !validate(descriptionValidatable) ||
-            !validate(peopleValidatable)
+            !validation.validate(titleValidatable) ||
+            !validation.validate(descriptionValidatable) ||
+            !validation.validate(peopleValidatable)
         ) {
             alert('Invalid input, please try again!');
             return;
@@ -91,7 +94,7 @@ export default class ProjectInput extends Component<HTMLDivElement, HTMLFormElem
         //      Option 2: Array.isArray(userInput) // The lecturer went with this option
         if (Array.isArray(userInput)) {
             const [title, description, people] = userInput;
-            projectState.addProject(title, description, people);
+            ProjectState.addProject(title, description, people); // need to update ProjectState here as it was alliased in the import
             this.clearInputs();
         }
     }

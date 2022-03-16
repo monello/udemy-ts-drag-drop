@@ -1,4 +1,6 @@
 /// <reference path="component.ts" />
+/// <reference path="../utils/validation.ts" />
+/// <reference path="../state/project.ts" />
 
 namespace App {
     // Project Input and Data Gethering

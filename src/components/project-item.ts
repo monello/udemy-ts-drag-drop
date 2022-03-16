@@ -1,4 +1,6 @@
 /// <reference path="component.ts" />
+/// <reference path="../models/drag-drop.ts" />
+/// <reference path="../models/project.ts" />
 
 namespace App {
     // Project Item

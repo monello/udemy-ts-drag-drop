@@ -44,3 +44,4 @@ Implementing Drag & Drop | Here is a series of commits that demostrate how to im
  | | | part 3 [:octocat:](https://github.com/monello/udemy-ts-drag-drop/commit/6ed74604f4e5ce45c0b3051ca34313b1c0e0477a)
  | | | part 4 [:octocat:](https://github.com/monello/udemy-ts-drag-drop/commit/69630d997d33998ad7d10428d2afa229a3e8fb65)
  Cypress Drag & Drop tests | Created test specs to create new projects, and drag and drop projects. Also used Cypress commands to go DRY | [:octocat:](https://github.com/monello/udemy-ts-drag-drop/commit/d8ad0fd5091a999f67d95dfb174fa38764574504)
+WebPack | The next few commits deal with installing, configuring and running WebPack | [:octocat:](https://github.com/monello/udemy-ts-drag-drop/commit/36676873c67b6bfcee2cc251f7eaa893eb7655e2)

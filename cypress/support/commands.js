@@ -45,3 +45,14 @@ Cypress.Commands.add('submitAndExpectReset', () => {
     cy.get('@desc').should('have.value', '');
     cy.get('@people').should('have.value', '');
 });
+
+Cypress.Commands.add('newProject', (title, description, people) => {
+    // Fill in the all fields correctly
+    cy.get('input#title').as('title').type(title);
+    cy.get('textarea#description').as('desc').type(description);
+    cy.get('input#people').as('people').type(people);
+
+    cy.get('form#user-input')
+        .find('button[type="submit"]')
+        .click()
+});

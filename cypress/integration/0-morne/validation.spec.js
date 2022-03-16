@@ -5,12 +5,15 @@ describe('Validates form input', () => {
         cy.visit('/');
     });
 
+    // EMPTY FORM
+    // ------------------------------------------------------------------------------
+
     it('tests a blank form submission', () => {
         // Leave all the fields blank
         cy.submitAndExpectError();
     });
 
-    // EMPTY FORM
+    // SUCESSFUL SUBMISSION
     // ------------------------------------------------------------------------------
 
     it('submit a form successfully and reset to empty fields', () => {
@@ -23,7 +26,7 @@ describe('Validates form input', () => {
         cy.submitAndExpectReset();
     });
 
-    // SUCESSFUL SUBMISSION
+    // REQUIRED
     // ------------------------------------------------------------------------------
 
     it('checks required validation for the title field', () => {
@@ -36,9 +39,6 @@ describe('Validates form input', () => {
         // Submit form and assert error-alert
         cy.submitAndExpectError();
     });
-
-    // REQUIRED
-    // ------------------------------------------------------------------------------
 
     it('checks required validation for the description field', () => {
         // Leave description blank
@@ -75,10 +75,10 @@ describe('Validates form input', () => {
         cy.submitAndExpectError();
     });
 
-    it('checks maxLength:10 validation for the descripion field', () => {
-        // Fill in the all field correctly, but > 10 chars in dsecription
+    it('checks maxLength:100 validation for the descripion field', () => {
+        // Fill in the all field correctly, but > 100 chars in dsecription
         cy.get('input#title').as('title').type('TS');
-        cy.get('textarea#description').as('desc').type('TypeScript 2022');
+        cy.get('textarea#description').as('desc').type('TypeScript 2022 TypeScript 2022 TypeScript 2022 TypeScript 2022 TypeScript 2022 TypeScript 2022 TypeScript 2022');
         cy.get('input#people').as('people').type(1);
 
         // Submit form and assert error-alert

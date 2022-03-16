@@ -1,6 +1,6 @@
-import Project from "../models/project.js";
-import Component from "./component.js";
-import { Draggable } from "../models/drag-drop.js"
+import Project from "../models/project";
+import Component from "./component";
+import { Draggable } from "../models/drag-drop"
 
 // Project Item
 // -----------------------------------------------------------------------------------------------------------

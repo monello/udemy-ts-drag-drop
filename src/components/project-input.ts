@@ -1,7 +1,7 @@
-import Component from "./component.js";
+import Component from "./component";
 //import { validate, foobar } from "../utils/validation";
-import * as validation from "../utils/validation.js";   // example of a bundled import using an alias
-import { projectState as ProjectState } from "../state/project.js"; // Example of aliasing a single import
+import * as validation from "../utils/validation";   // example of a bundled import using an alias
+import { projectState as ProjectState } from "../state/project"; // Example of aliasing a single import
 
 validation.foobar();
 
